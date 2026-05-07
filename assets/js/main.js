@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const scrollMorphHero = document.querySelector('.scroll-morph-hero');
     if (scrollMorphHero) {
       const morphIcons = Array.from(scrollMorphHero.querySelectorAll('.morph-icon'));
+      const morphCore = scrollMorphHero.querySelector('.morph-core');
+      const morphStage = scrollMorphHero.querySelector('.scroll-morph-stage');
 
       function clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
@@ -129,6 +131,47 @@ document.addEventListener('DOMContentLoaded', function () {
         if (raw.endsWith('vh')) return window.innerHeight * numeric / 100;
         if (raw.endsWith('rem')) return numeric * parseFloat(getComputedStyle(document.documentElement).fontSize);
         return numeric;
+      }
+
+      function iconScatter(index, isMobile) {
+        const horizontal = Math.sin((index + 1) * 2.41) * (isMobile ? 22 : 58);
+        const vertical = Math.cos((index + 1) * 1.73) * (isMobile ? 38 : 82);
+        return { x: horizontal, y: vertical };
+      }
+
+      function floatingPoint(index, isMobile, alternate) {
+        const desktopPoints = [
+          [-42, -24], [-29, 31], [-12, -42], [9, 25], [28, -18], [36, 24],
+          [-46, 7], [-22, 57], [2, 45], [22, 61], [40, -50], [-36, -54],
+          [-3, 18], [16, -62], [35, 8], [-12, 68], [48, 55], [-49, 48],
+          [51, -4], [12, 73]
+        ];
+        const desktopAlt = [
+          [-35, 48], [-45, -36], [-19, -58], [4, 62], [24, 35], [42, 8],
+          [-31, 2], [-6, 28], [15, -37], [34, 55], [44, -62], [-43, 66],
+          [4, -34], [25, -8], [39, 23], [-20, 72], [50, 43], [-52, 12],
+          [43, 66], [-5, -48]
+        ];
+        const mobilePoints = [
+          [-42, -43], [-18, -50], [9, -46], [38, -38], [-35, -18],
+          [-6, -25], [24, -16], [43, 2], [-42, 12], [-18, 4],
+          [8, 10], [34, 22], [-36, 36], [-10, 43], [18, 39],
+          [42, 48], [-27, 58], [2, 61], [29, 63], [0, -2]
+        ];
+        const mobileAlt = [
+          [-38, 4], [-28, -30], [-4, -40], [24, -30], [42, -12],
+          [-44, 28], [-18, 20], [9, 31], [36, 42], [-32, -48],
+          [-7, -14], [18, -5], [43, 15], [-41, 50], [-13, 55],
+          [14, 50], [39, 60], [-25, 7], [4, 3], [28, 10]
+        ];
+        const points = isMobile ? (alternate ? mobileAlt : mobilePoints) : (alternate ? desktopAlt : desktopPoints);
+        const point = points[index % points.length];
+        const width = window.innerWidth * (isMobile ? 0.78 : 0.82);
+        const height = window.innerHeight * (isMobile ? 0.64 : 0.68);
+        return {
+          x: (point[0] / 100) * width,
+          y: (point[1] / 100) * height
+        };
       }
 
       const iconTargets = morphIcons.map(function (icon) {
@@ -155,42 +198,52 @@ document.addEventListener('DOMContentLoaded', function () {
         const reveal = prefersStaticMorph ? 1 : smoothstep(0.02, 0.16, progress);
         const spread = prefersStaticMorph ? 1 : smoothstep(isMorphMobile ? 0.1 : 0.18, isMorphMobile ? 0.44 : 0.5, progress);
         const close = prefersStaticMorph ? 0 : smoothstep(isMorphMobile ? 0.58 : 0.64, isMorphMobile ? 0.92 : 0.94, progress);
+        const copyFade = prefersStaticMorph ? 0 : smoothstep(isMorphMobile ? 0.18 : 0.22, isMorphMobile ? 0.4 : 0.46, progress);
+        const coreReveal = prefersStaticMorph ? 1 : smoothstep(isMorphMobile ? 0.34 : 0.4, isMorphMobile ? 0.54 : 0.58, progress);
+        const coreGrow = prefersStaticMorph ? 1 : smoothstep(isMorphMobile ? 0.78 : 0.82, isMorphMobile ? 0.96 : 0.98, progress);
         const easedProgress = smoothstep(0, 1, progress);
+        const iconMergeFade = 1 - smoothstep(0.62, 1, close);
+        let coreCloseY = 0;
+        if (morphCore && morphStage) {
+          const stageRect = morphStage.getBoundingClientRect();
+          const coreRect = morphCore.getBoundingClientRect();
+          coreCloseY = (coreRect.top + coreRect.height / 2) - (stageRect.top + stageRect.height / 2);
+        }
 
         scrollMorphHero.style.setProperty('--morph-grid-y', `${(-34 * easedProgress).toFixed(1)}px`);
-        scrollMorphHero.style.setProperty('--morph-copy-y', `${(-window.innerHeight * 0.08 * spread).toFixed(1)}px`);
-        scrollMorphHero.style.setProperty('--morph-copy-opacity', clamp(1 - close * 0.92, 0, 1).toFixed(3));
-        scrollMorphHero.style.setProperty('--morph-core-scale', (0.94 + close * 0.1).toFixed(3));
-        scrollMorphHero.style.setProperty('--morph-ring-opacity', (0.1 + close * 0.28).toFixed(3));
+        scrollMorphHero.style.setProperty('--morph-copy-y', `${(isMorphMobile ? 0 : -window.innerHeight * 0.08 * spread).toFixed(1)}px`);
+        scrollMorphHero.style.setProperty('--morph-copy-opacity', clamp(1 - copyFade, 0, 1).toFixed(3));
+        scrollMorphHero.style.setProperty('--morph-copy-glass', smoothstep(0.08, 0.28, progress).toFixed(3));
+        scrollMorphHero.style.setProperty('--morph-core-scale', (0.94 + close * 0.08 + coreGrow * (isMorphMobile ? 1.38 : 1.82)).toFixed(3));
+        scrollMorphHero.style.setProperty('--morph-core-opacity', coreReveal.toFixed(3));
+        scrollMorphHero.style.setProperty('--morph-ring-opacity', (coreReveal * (0.22 + close * 0.28)).toFixed(3));
         scrollMorphHero.style.setProperty('--morph-cue-opacity', clamp(1 - close, 0, 1).toFixed(3));
+        if (morphCore) {
+          morphCore.classList.toggle('is-active', coreReveal > 0.65);
+        }
+
+        if (isMorphMobile && progress > 0.86) {
+          const spreadsheetsHero = document.getElementById('spreadsheets-hero');
+          if (spreadsheetsHero) spreadsheetsHero.classList.add('is-visible');
+        }
 
         iconTargets.forEach(function (target, index) {
           if (isMorphMobile) {
-            const visibleCount = isMorphSmall ? 10 : 12;
-            if (index >= visibleCount) {
-              target.icon.style.display = 'none';
-              return;
-            }
-
             target.icon.style.display = 'grid';
-            const circleAngle = ((index / visibleCount) * 360 - 90) * Math.PI / 180;
-            const circleRadiusX = Math.min(window.innerWidth * 0.34, 150);
-            const circleRadiusY = isMorphSmall ? 98 : 118;
-            const circleX = Math.cos(circleAngle) * circleRadiusX;
-            const circleY = Math.sin(circleAngle) * circleRadiusY + (isMorphSmall ? 64 : 72);
-
-            const arcAngle = (-102 + (index / Math.max(visibleCount - 1, 1)) * 204) * Math.PI / 180;
-            const arcRadiusX = Math.min(window.innerWidth * 0.43, 180);
-            const arcRadiusY = isMorphSmall ? 132 : 154;
-            const arcX = Math.cos(arcAngle) * arcRadiusX;
-            const arcY = Math.sin(arcAngle) * arcRadiusY + (isMorphSmall ? 90 : 104);
+            const scatter = iconScatter(index, true);
+            const firstPoint = floatingPoint(index, true, false);
+            const secondPoint = floatingPoint(index, true, true);
+            const circleX = firstPoint.x + (scatter.x * 0.35);
+            const circleY = firstPoint.y + (scatter.y * 0.45);
+            const arcX = secondPoint.x + (scatter.x * 0.55);
+            const arcY = secondPoint.y + (scatter.y * 0.6);
 
             const openX = circleX + (arcX - circleX) * spread;
             const openY = circleY + (arcY - circleY) * spread;
             const finalX = openX * (1 - close);
-            const finalY = openY * (1 - close);
+            const finalY = openY * (1 - close) + (coreCloseY * close);
             const mobileScale = Math.max(0.12, ((isMorphSmall ? 0.78 : 0.86) * reveal) - close * 0.42);
-            const mobileOpacity = clamp((reveal * 1.05) - close * 0.72, 0, 1);
+            const mobileOpacity = clamp(reveal * 1.05 * iconMergeFade, 0, 1);
 
             target.icon.style.setProperty('--morph-x', `${finalX.toFixed(1)}px`);
             target.icon.style.setProperty('--morph-y', `${finalY.toFixed(1)}px`);
@@ -201,19 +254,20 @@ document.addEventListener('DOMContentLoaded', function () {
           }
 
           target.icon.style.display = 'grid';
-          const angleRad = target.angle * Math.PI / 180;
-          const radius = unitToPixels(target.radius);
-          const circleX = Math.cos(angleRad) * radius;
-          const circleY = Math.sin(angleRad) * radius;
-          const arcX = unitToPixels(target.arcX);
-          const arcY = unitToPixels(target.arcY);
+          const scatter = iconScatter(index, false);
+          const firstPoint = floatingPoint(index, false, false);
+          const secondPoint = floatingPoint(index, false, true);
+          const circleX = firstPoint.x + (scatter.x * 0.35);
+          const circleY = firstPoint.y + (scatter.y * 0.35);
+          const arcX = secondPoint.x + (scatter.x * 0.55);
+          const arcY = secondPoint.y + (scatter.y * 0.55);
           const openX = circleX + (arcX - circleX) * spread;
           const openY = circleY + (arcY - circleY) * spread;
           const finalX = openX * (1 - close);
-          const finalY = openY * (1 - close);
+          const finalY = openY * (1 - close) + (coreCloseY * close);
           const rotate = (target.angle * 0.08) + (spread * (index % 2 ? -6 : 6)) - (close * (target.angle * 0.08));
           const scale = Math.max(0.08, (0.18 + reveal * 0.92) - close * 0.52);
-          const opacity = clamp((reveal * 1.05) - (close * 0.72), 0, 1);
+          const opacity = clamp(reveal * 1.05 * iconMergeFade, 0, 1);
 
           target.icon.style.setProperty('--morph-x', `${finalX.toFixed(1)}px`);
           target.icon.style.setProperty('--morph-y', `${finalY.toFixed(1)}px`);
