@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const navToggle = document.querySelector('.nav-toggle');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobileViewport = window.matchMedia('(max-width: 900px)').matches;
+  const isCompactViewport = window.matchMedia('(max-width: 1100px), (pointer: coarse)').matches;
   const canHoverFine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   navLinks.forEach(link => {
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
       item.style.setProperty('--fade-delay', `${Math.min(index % 6, 5) * 45}ms`);
     });
 
-    if (isMobileViewport) {
+    if (isCompactViewport) {
       fadeItems.forEach(function (item) {
         item.classList.add('is-visible');
       });

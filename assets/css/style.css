@@ -274,6 +274,8 @@ nav.nav-scrolled {
 /* ── SECTION PRIMITIVES ── */
 .section { padding: 6rem 4rem; }
 .section-sm { padding: 4rem 4rem; }
+.page-offset > .page-hero + .section { padding-top: 3rem; }
+.page-offset > .page-hero + .section .container > :first-child { margin-top: 0; }
 .container { width: 100%; max-width: 1200px; margin: 0 auto; }
 .section-tag {
   display: inline-flex; align-items: center; gap: 0.5rem;
@@ -315,7 +317,8 @@ h2.display-light em { color: var(--teal-light); }
 
 /* ── PAGE HERO ── */
 .page-hero {
-  background: var(--navy-deep); padding: 5rem 4rem 4rem;
+  background: var(--navy-deep); padding: 4.5rem 4rem 4rem;
+  height: 400px;
   position: relative; overflow: hidden;
 }
 .page-hero::before {
@@ -461,24 +464,55 @@ footer {
 }
 .scroll-morph-copy {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   z-index: 3;
   width: min(760px, calc(100% - 2rem));
   text-align: center;
   padding: clamp(1.35rem, 3vw, 2.4rem) clamp(1.15rem, 4vw, 3.2rem);
   border-radius: 28px;
   background:
-    linear-gradient(145deg, rgba(255,255,255,calc(0.14 * var(--morph-copy-glass, 0))), rgba(255,255,255,calc(0.035 * var(--morph-copy-glass, 0)))),
-    rgba(15,30,40,calc(0.16 * var(--morph-copy-glass, 0)));
-  border: 1px solid rgba(255,255,255,calc(0.18 * var(--morph-copy-glass, 0)));
+    linear-gradient(145deg, rgba(255,255,255,calc(0.26 * var(--morph-copy-glass, 0))), rgba(255,255,255,calc(0.045 * var(--morph-copy-glass, 0)))),
+    rgba(15,30,40,calc(0.075 * var(--morph-copy-glass, 0)));
+  border: 1px solid rgba(255,255,255,calc(0.42 * var(--morph-copy-glass, 0)));
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,calc(0.2 * var(--morph-copy-glass, 0))),
-    0 28px 70px rgba(0,0,0,calc(0.2 * var(--morph-copy-glass, 0)));
-  backdrop-filter: blur(calc(18px * var(--morph-copy-glass, 0))) saturate(calc(1 + (0.2 * var(--morph-copy-glass, 0))));
-  -webkit-backdrop-filter: blur(calc(18px * var(--morph-copy-glass, 0))) saturate(calc(1 + (0.2 * var(--morph-copy-glass, 0))));
+    inset 0 1px 0 rgba(255,255,255,calc(0.58 * var(--morph-copy-glass, 0))),
+    inset 1px 0 0 rgba(255,255,255,calc(0.16 * var(--morph-copy-glass, 0))),
+    inset 0 -1px 0 rgba(255,255,255,calc(0.12 * var(--morph-copy-glass, 0))),
+    0 28px 70px rgba(0,0,0,calc(0.22 * var(--morph-copy-glass, 0))),
+    0 0 28px rgba(255,255,255,calc(0.08 * var(--morph-copy-glass, 0)));
+  backdrop-filter: blur(calc(30px * var(--morph-copy-glass, 0))) saturate(calc(1 + (0.7 * var(--morph-copy-glass, 0))));
+  -webkit-backdrop-filter: blur(calc(30px * var(--morph-copy-glass, 0))) saturate(calc(1 + (0.7 * var(--morph-copy-glass, 0))));
   transform: translateY(var(--morph-copy-y, 0px));
   opacity: var(--morph-copy-opacity, 1);
   pointer-events: none;
   transition: background 0.08s linear, border-color 0.08s linear, box-shadow 0.08s linear, backdrop-filter 0.08s linear;
+}
+.scroll-morph-copy::before,
+.scroll-morph-copy::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  opacity: var(--morph-copy-glass, 0);
+}
+.scroll-morph-copy::before {
+  inset: 1px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255,255,255,0.44), transparent 28%),
+    radial-gradient(circle at 82% 0%, rgba(83,177,205,0.22), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,0.2), transparent 46%, rgba(255,255,255,0.08));
+}
+.scroll-morph-copy::after {
+  top: -45%;
+  left: -18%;
+  z-index: 0;
+  width: 44%;
+  height: 190%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.42), rgba(255,255,255,0.08), transparent);
+  transform: translateX(calc(var(--morph-copy-glass, 0) * 220%)) rotate(18deg);
+  filter: blur(1px);
 }
 .scroll-morph-copy .hero-eyebrow {
   margin-bottom: 1.2rem;
@@ -486,6 +520,8 @@ footer {
   background: rgba(83,177,205,0.12);
 }
 .scroll-morph-copy h1 {
+  position: relative;
+  z-index: 1;
   font-family: 'DM Serif Display', serif;
   font-size: clamp(2.8rem, 6.4vw, 6.1rem);
   line-height: 1;
@@ -612,13 +648,21 @@ footer {
   height: var(--tile-size);
   padding: 11px;
   border-radius: 22px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06));
-  border: 1px solid rgba(255,255,255,0.24);
+  position: absolute;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.42), rgba(255,255,255,0.05)),
+    rgba(15,30,40,0.035);
+  border: 1px solid rgba(255,255,255,0.58);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.28),
-    0 18px 42px rgba(0,0,0,0.22);
-  backdrop-filter: blur(14px) saturate(1.25);
-  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    inset 0 1px 0 rgba(255,255,255,0.78),
+    inset 1px 0 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(255,255,255,0.18),
+    0 18px 42px rgba(0,0,0,0.24),
+    0 0 32px rgba(255,255,255,0.12);
+  backdrop-filter: blur(34px) saturate(2);
+  -webkit-backdrop-filter: blur(34px) saturate(2);
   transform:
     translate3d(calc(-50% + var(--morph-x)), calc(-50% + var(--morph-y)), 0)
     rotate(var(--morph-rotate))
@@ -626,7 +670,34 @@ footer {
   opacity: var(--morph-opacity);
   transition: transform 0.08s linear, opacity 0.08s linear;
 }
+.morph-icon::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 24% 16%, rgba(255,255,255,0.78), transparent 28%),
+    radial-gradient(circle at 82% 8%, rgba(83,177,205,0.26), transparent 36%),
+    linear-gradient(135deg, rgba(255,255,255,0.2), transparent 48%, rgba(255,255,255,0.1));
+  opacity: 0.82;
+}
+.morph-icon::after {
+  content: '';
+  position: absolute;
+  top: -42%;
+  left: -32%;
+  z-index: 1;
+  width: 42%;
+  height: 185%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.62), rgba(255,255,255,0.12), transparent);
+  transform: rotate(22deg);
+  filter: blur(0.5px);
+  opacity: 0.9;
+}
 .morph-icon img {
+  position: relative;
+  z-index: 2;
   width: var(--size);
   height: var(--size);
   object-fit: contain;
@@ -933,6 +1004,7 @@ footer {
 ══════════════════════════════════════════ */
 
 .services-detail { background: white; }
+.services-detail .service-block:first-child { padding-top: 0; }
 .service-block {
   display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem;
   align-items: start; padding: 4rem 0;
@@ -1300,6 +1372,12 @@ footer {
   .nav-links a { padding: 0.5rem 0.65rem; }
   .hero, .contact-grid, .ms-grid { gap: 2.5rem; }
   .footer-top { grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 2rem; }
+  .scroll-fade {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 980px) {
@@ -1426,7 +1504,8 @@ footer {
   .hero h1 { font-size: clamp(2.35rem, 9vw, 3.6rem); }
   .hero-sub { max-width: 680px; }
   .section, .section-sm { padding: 4rem 1.5rem; }
-  .page-hero { padding: 4rem 1.5rem 3.5rem; }
+  .page-offset > .page-hero + .section { padding-top: 2.5rem; }
+  .page-hero { height: 380px; padding: 3.5rem 1.5rem 3.5rem; }
   .services-strip { padding: 1.5rem; }
   .strip-inner { align-items: flex-start; gap: 1rem; }
   .strip-divider { display: none; }
@@ -1488,8 +1567,8 @@ footer {
     padding: 1rem 0.85rem;
     border-radius: 18px;
     background:
-      linear-gradient(145deg, rgba(255,255,255,calc(0.12 * var(--morph-copy-glass, 0))), rgba(255,255,255,calc(0.03 * var(--morph-copy-glass, 0)))),
-      rgba(15,30,40,calc(0.12 * var(--morph-copy-glass, 0)));
+      linear-gradient(145deg, rgba(255,255,255,calc(0.18 * var(--morph-copy-glass, 0))), rgba(255,255,255,calc(0.035 * var(--morph-copy-glass, 0)))),
+      rgba(15,30,40,calc(0.08 * var(--morph-copy-glass, 0)));
   }
   .scroll-morph-copy p { font-size: 0.92rem; }
   .morph-orbit {
@@ -1536,16 +1615,11 @@ footer {
     width: 100%;
     padding: 0.9rem 1rem;
   }
-  .page-hero { padding: 3rem 1rem; }
+  .page-hero { height: auto; min-height: 320px; padding: 2.75rem 1rem 3rem; }
   .page-hero h1 { font-size: clamp(2rem, 12vw, 2.7rem); }
   .page-hero p, .lead, .cta-section p { font-size: 0.94rem; }
   .section, .section-sm { padding: 3rem 1rem; }
-  .scroll-fade {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    transition: none;
-  }
+  .page-offset > .page-hero + .section { padding-top: 2rem; }
   h2.display { font-size: clamp(1.85rem, 10vw, 2.35rem); }
   .pain-grid, .proof-grid, .values-grid, .pricing-grid,
   .cases-grid-full, .process-steps, .form-row,
