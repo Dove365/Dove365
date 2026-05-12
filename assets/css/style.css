@@ -187,7 +187,7 @@ nav.nav-scrolled {
   box-shadow: 0 14px 40px rgba(15,30,40,0.22);
 }
 .nav-logo {
-  display: flex; align-items: center; gap: 0.55rem;
+  display: flex; align-items: center; gap: 0.7rem;
   text-decoration: none; margin-right: auto;
   min-width: 0;
 }
@@ -199,8 +199,8 @@ nav.nav-scrolled {
 .nav-logo-text {
   font-family: 'DM Serif Display', serif;
   color: var(--white);
-  font-size: 1.05rem;
-  line-height: 1.1;
+  font-size: 1.38rem;
+  line-height: 1;
   white-space: nowrap;
 }
 .nav-logo-text small {
@@ -1173,7 +1173,7 @@ footer {
   text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 100px;
   margin-bottom: 1rem; font-weight: 600;
 }
-.case-type-tcs { background: rgba(7,131,150,0.2); color: var(--teal-light); }
+.case-type-dove365 { background: rgba(7,131,150,0.2); color: var(--teal-light); }
 .case-type-role { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
 .case-card-header h3 {
   font-family: 'DM Serif Display', serif;
@@ -1547,7 +1547,7 @@ footer {
   }
   .nav-logo { gap: 0.65rem; }
   .nav-logo-mark { height: 36px; }
-  .nav-logo-text { font-size: 0.92rem; }
+  .nav-logo-text { font-size: 1.12rem; }
   .nav-logo-text small { font-size: 0.54rem; letter-spacing: 0.08em; }
   .nav-toggle { width: 40px; height: 40px; }
   #spreadsheets-hero { scroll-margin-top: 64px; }
@@ -1674,7 +1674,7 @@ footer {
 
 @media (max-width: 420px) {
   .nav-logo-mark { height: 32px; }
-  .nav-logo-text { font-size: 0.84rem; }
+  .nav-logo-text { font-size: 1rem; }
   .nav-logo-text small { font-size: 0.48rem; }
   .hero h1 { font-size: 2.25rem; }
   .btn { padding-left: 1rem; padding-right: 1rem; }
